@@ -9,6 +9,9 @@ import 'package:flutter_crm/screens/project/project_cards.dart';
 import 'package:flutter_crm/screens/project/projects.dart';
 import 'package:flutter_crm/settings/settings_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import './admin_task_page.dart';
+import './user_task_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -28,6 +31,21 @@ class _MainPageState extends State<MainPage> {
     PlotsPage(),
     SettingsPage(),
   ];
+
+  String? _role = 'ROLE_USER'; // default
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRole();
+  }
+
+  void _loadRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _role = prefs.getString('role') ?? 'ROLE_USER';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +68,15 @@ class _MainPageState extends State<MainPage> {
               ),
               actions: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    if (_role == 'ROLE_ADMIN') {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => AdminTaskPage()));
+                    } else {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => UserTaskPage()));
+                    }
+                  },
                   icon: Icon(Icons.notifications),
                   color: Colors.white,
                 ),
